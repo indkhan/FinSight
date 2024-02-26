@@ -10,6 +10,7 @@ from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 
 from dotenv import load_dotenv
+
 load_dotenv()  # take environment variables from .env (especially openai api key)
 
 st.title("RockyBot: News Research Tool 📈")
@@ -39,10 +40,10 @@ if process_url_clicked:
         st.stop()
     main_placeholder.text("Data Loading...Started...✅✅✅")
     data = loader.load()
+    st.sidebar.write(data)
     # split data
     text_splitter = RecursiveCharacterTextSplitter(
-        separators=['\n\n', '\n', '.', ','],
-        chunk_size=500
+        separators=["\n\n", "\n", ".", ","], chunk_size=500
     )
     main_placeholder.text("Text Splitter...Started...✅✅✅")
     docs = text_splitter.split_documents(data)
@@ -62,7 +63,8 @@ if query:
         with open(file_path, "rb") as f:
             vectorstore = pickle.load(f)
             chain = RetrievalQAWithSourcesChain.from_llm(
-                llm=llm, retriever=vectorstore.as_retriever())
+                llm=llm, retriever=vectorstore.as_retriever()
+            )
             result = chain({"question": query}, return_only_outputs=True)
             # result will be a dictionary of this format --> {"answer": "", "sources": [] }
             st.header("Answer")
